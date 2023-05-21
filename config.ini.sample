@@ -8,6 +8,8 @@
 fullscreen=false
 ; set this to false to run m8c in software rendering mode (may be useful for Raspberry Pi)
 use_gpu=true
+; set this to true to disable the mouse cursor at startup
+diable_cursor=true
 ; the delay amount in ms in the main loop, decrease value for faster operation, increase value if too much cpu usage
 idle_ms = 10
 ; show a spinning cube if device is not inserted
@@ -36,14 +38,14 @@ key_reset=21
 [gamepad]
 ; these need to be the decimal value of the SDL Controller buttons.
 ; a table exists here: https://wiki.libsdl.org/SDL_GameControllerButton
-gamepad_up=11
-gamepad_left=13
-gamepad_down=12
-gamepad_right=14
+gamepad_up=-1
+gamepad_left=-1
+gamepad_down=-1
+gamepad_right=-1
 gamepad_select=4
 gamepad_start=6
-gamepad_opt=1
-gamepad_edit=0
+gamepad_opt=2
+gamepad_edit=1
 gamepad_quit=8
 gamepad_reset=7
 
@@ -54,7 +56,7 @@ gamepad_analog_invert=false ;NOT IMPLEMENTED YET: invert up/down and left/right 
 ; you can use -1 if you do not wish to map the function to an analog axis
 gamepad_analog_axis_updown=1
 gamepad_analog_axis_leftright=0
-gamepad_analog_axis_start=5
-gamepad_analog_axis_select=4
+gamepad_analog_axis_start=-1
+gamepad_analog_axis_select=-1
 gamepad_analog_axis_opt=-1
 gamepad_analog_axis_edit=-1
