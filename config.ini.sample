@@ -5,17 +5,22 @@
 
 [graphics]
 ; set this to true to have m8c start fullscreen
-fullscreen=false
+fullscreen=true
 ; set this to false to run m8c in software rendering mode (may be useful for Raspberry Pi)
 use_gpu=true
-; set this to true to disable the mouse cursor at startup
-diable_cursor=true
 ; the delay amount in ms in the main loop, decrease value for faster operation, increase value if too much cpu usage
 idle_ms = 10
 ; show a spinning cube if device is not inserted
 wait_for_device = true
+; set this to true to disable the mouse cursor at startup
+diable_cursor=true
 ; number of zero-byte attempts to disconnect if wait_for_device = false (128 = about 2 sec for default idle_ms)
 wait_packets = 128
+
+[audio]
+audio_enabled=false
+audio_buffer_size=1024
+audio_device_name=Default
 
 [keyboard]
 ; these need to be the decimal value of the SDL scancodes.
@@ -46,8 +51,8 @@ gamepad_select=4
 gamepad_start=6
 gamepad_opt=2
 gamepad_edit=1
-gamepad_quit=8
-gamepad_reset=7
+gamepad_quit=-1
+gamepad_reset=-1
 
 gamepad_analog_threshold=32766 ;the threshold for analog sticks to trigger cursor movement (working values: 1-32766)
 gamepad_analog_invert=false ;NOT IMPLEMENTED YET: invert up/down and left/right axis (true/false)
