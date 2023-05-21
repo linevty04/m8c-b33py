@@ -82,6 +82,11 @@ int main(int argc, char *argv[]) {
 #ifdef DEBUG_MSG
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 #endif
+  
+  // force disable mouse cursor
+  if (conf.init_disable_cursor) {
+    SDL_ShowCursor(SDL_DISABLE);
+  }
 
   // main loop begin
   do {
