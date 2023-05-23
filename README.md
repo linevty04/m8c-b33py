@@ -108,7 +108,7 @@ And here's a video showing the unit's innards and how the Lego buttons work (cli
 
 2. Download and unzip [Patchbox OS](https://blokas.io/patchbox-os/#patchbox-os-download).
 
-3. Insert the SD card to your computer's SD card reader and launch balenaEtcher.
+3. Insert the SD card to your computer's SD card reader and launch [balenaEtcher](https://etcher.balena.io/).
 
 4. Click `Flash from File` and select the file you want to upload (e.g. 2022-05-17-Patchbox.img).
 
@@ -116,62 +116,68 @@ And here's a video showing the unit's innards and how the Lego buttons work (cli
 
 6. After flashing, safely remove the SD card, insert it into your Raspberry Pi and power it on.
 
-7. Connect your computer to the same Network as Raspberry Pi.
-
-8. Open a Terminal window and paste the following after boot is complete (password: `blokaslabs`):
+7. Connect your computer to the same Network as Raspberry Pi, open a Terminal window and paste the following after boot is complete (default password: `blokaslabs`):
 ```
 ssh-keygen -R patchbox.local
 ssh patch@patchbox.local
 ```
-9. Follow the Setup Wizard instructions. Within the wizard, start by updating if required, then change your password, configure the audio settings following these [instructions](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/AUDIOGUIDE.md#patchbox-os-setup-wizard), choose the boot environment (`Console Autologin`), disable Wi-Fi and, lastly, do not select any module (`None: Default Patchbox OS Environment`).
+8. Follow the Setup Wizard instructions:
 
-10. Once the setup if finished, open the `config.txt` file to edit the display settings, disable Bluetooth and WiFi and improve boot time:
+- If prompted, start by updating Patchbox OS;
+
+- Then, for security reasons, change the default password;
+
+- Follow these [instructions](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/AUDIOGUIDE.md#patchbox-os-setup-wizard) to configure the audio settings;
+
+- Choose the boot environment `Console Autologin`;
+
+- When prompted, disable Wi-Fi;
+
+- Select `None: Default Patchbox OS Environment` to disable modules.
+
+9. Once the setup if finished, open the `config.txt` file to edit the display settings, disable Bluetooth and WiFi and improve boot time:
 ```
 sudo nano /boot/config.txt
 ```
-11. You may need to adjust the display settings to achieve a suitable resolution for M8C (more information [here](https://www.raspberrypi.com/documentation/computers/config_txt.html), [here](https://pimylifeup.com/raspberry-pi-screen-resolution) and [here](https://www.scribd.com/document/519276699/raspberry-pi-4-HDMI)). In my case, I had to edit the following lines in under the HDMI settings:
+10. You may need to adjust the display settings to achieve a suitable resolution for M8C (more information [here](https://www.raspberrypi.com/documentation/computers/config_txt.html), [here](https://pimylifeup.com/raspberry-pi-screen-resolution) and [here](https://www.scribd.com/document/519276699/raspberry-pi-4-HDMI)). In my case, I had to edit the following lines in under the HDMI settings:
 ```
 hdmi_force_hotplug=1
 hdmi_group=2
 hdmi_mode=2
 hdmi_cvt=480p 60 6 0 0 0
 ```
-12. If you have black borders around your display or if you cannot see the whole display, you may need to adjust `overscan`. In my case, I need to add the following so the left side of the display doesn’t go under the screen cover/protection:
+11. If you have black borders around your display or if you cannot see the whole display, you may need to adjust `overscan`. In my case, I need to add the following so the left side of the display doesn’t go under the screen cover/protection:
 ```
 overscan_left=16
 ```
-13. Disable the on-board or internal (Broadcom) sound card, just add the following under `# Enable audio (loads snd_bcm2835)` ([source](https://raspberrypi.stackexchange.com/questions/80072/how-can-i-use-an-external-usb-sound-card-and-set-it-as-default)):
+12. Disable the on-board or internal (Broadcom) sound card, just add the following under `# Enable audio (loads snd_bcm2835)` ([source](https://raspberrypi.stackexchange.com/questions/80072/how-can-i-use-an-external-usb-sound-card-and-set-it-as-default)):
 ```
 dtparam=audio=off
 ```
-14. Disable HDMI audio, under `# Enable DRM VC4 V3D driver` ([source](https://forums.raspberrypi.com/viewtopic.php?t=324935#:~:text=The%20analogue%20audio%20output%20can,Engineer%20at%20Raspberry%20Pi%20Trading.)):
+13. Disable HDMI audio, under `# Enable DRM VC4 V3D driver` ([source](https://forums.raspberrypi.com/viewtopic.php?t=324935#:~:text=The%20analogue%20audio%20output%20can,Engineer%20at%20Raspberry%20Pi%20Trading.)):
 ```
 dtoverlay=vc4-kms-v3d,noaudio
 ```
-15. Add the following under the first `[all]` ([source](https://www.animmouse.com/p/how-to-disable-wifi-and-bluetooth-on-raspberry-pi/)). To enable these options back, just comment each line. Note that you’ll need an ethernet cable from here on:
+14. Add the following under the first `[all]` ([source](https://www.animmouse.com/p/how-to-disable-wifi-and-bluetooth-on-raspberry-pi/)). To enable these options back, just comment each line. Note that you’ll need an ethernet cable from here on:
 ```
 dtoverlay=disable-bt
 dtoverlay=disable-wifi
 ```
-16. Save, exit and reboot the Raspberry Pi.
+15. Exit with `ctrl + x`, save and reboot the Raspberry Pi with `sudo reboot`.
 
-17. To improve boot time, go to raspi-config and disable `Wait for Network on Boot`, under `System Options` and `Network at Boot`:
+16. To improve boot time, go to `raspi-config` and disable `Wait for Network on Boot`, under `System Options` and `Network at Boot`:
 ```
 sudo raspi-config
 ```
-18. Still in `raspi-config`, set the locale to `en_US.UTF-8`.
+17. Still in `raspi-config`, go to `Localisation Options`, then `Locale`, and select `en_US.UTF-8` only using the `spacebar`. Exit `raspi-config` and reboot.
 
-19. Go to `Localisation Options`, then `Locale`, and select `en_US.UTF-8` using the spacebar. Exit raspi-config and reboot:
-```
-sudo reboot
-```
-20. Login again and finish setting the locale:
+18. Login again and finish setting the locale:
 ```
 sudo update-locale LC_ALL="en_US.UTF-8"
 sudo update-locale LANGUAGE="en_US"
 sudo reboot
 ```
-21. Login again and check that your Raspberry Pi OS locale is properly set by typing the command locale and making sure it returns the following:
+19. Login again and check that your Raspberry Pi OS locale is properly set by typing the command locale and making sure it returns the following:
 ```
 locale
 ```
@@ -192,7 +198,7 @@ LC_MEASUREMENT="en_US.UTF-8"
 LC_IDENTIFICATION="en_US.UTF-8"
 LC_ALL=en_US.UTF-8
 ```
-22. Disable `pisound-ctl`, `pisound-btn`, `touchosc2midi` [services](https://blokas.io/patchbox-os/docs/troubleshooting) and opt-out of [statistics program](https://blokas.io/patchbox-os/docs/telemetry), which are not necessary:
+20. If you're not using [Pisound](https://blokas.io/pisound/), disable `pisound-ctl`, `pisound-btn`. If you're not using [TouchOSC2MIDI](https://github.com/velolala/touchosc2midi), disable `touchosc2midi`. You can also opt-out of [statistics program](https://blokas.io/patchbox-os/docs/telemetry), which are not necessary. All of this can be done with the following commands. More information [here](https://blokas.io/patchbox-os/docs/troubleshooting).
 ```
 sudo systemctl disable pisound-ctl
 sudo systemctl disable pisound-btn
@@ -200,7 +206,7 @@ sudo systemctl disable touchosc2midi
 sudo systemctl disable wifi-hotspot.service
 sudo systemctl disable --now blokas-telemetry.target
 ```
-23. Check if PulseAudio is running by typing `pactl list` in terminal. If PulseAudio is not necessary for your project, you can save some resources by permanently disabling it:
+21. Check if PulseAudio is running by typing `pactl list` in terminal. If PulseAudio is not necessary for your project, you can save some resources by permanently disabling it:
 ```
 systemctl --user stop pulseaudio.socket
 systemctl --user stop pulseaudio.service
@@ -213,21 +219,21 @@ systemctl --user mask pulseaudio.service
 
 ## Prepare to Install M8C
 
-24. Login again, update, install required packages and install `SLD2`:
+22. Login again, update, install required packages and install `SLD2`:
 ```
 sudo apt update && sudo apt install -y git gcc make libsdl2-2.0-0 libsdl2-dev
 sudo reboot
 ```
-25. Install other package needed to compile and install M8C:
+23. Install other package needed to compile and install M8C:
 ```
 sudo apt install -y autotools-dev autoconf libtool
 ```
-26. Download the source code for `libserialport`:
+24. Download the source code for `libserialport`:
 ```
 cd
 git clone https://github.com/sigrokproject/libserialport.git
 ```
-27. After cloning, compile and install:
+25. After cloning, compile and install:
 ```
 cd libserialport
 ./autogen.sh
@@ -235,12 +241,12 @@ cd libserialport
 make
 sudo make install
 ```
-28. A couple more steps:
+26. A couple more steps:
 ```
 sudo ln -s /usr/local/lib/libserialport.so.0.1.0 /usr/lib/libserialport.so.0.1.0
 sudo ln -s /usr/local/lib/libserialport.so.0 /usr/lib/libserialport.so.0
 ```
-29. And finally, run to finalise the packages installation and to ensure the library is found when building M8C:
+27. And finally, run to finalise the packages installation and to ensure the library is found when building M8C:
 ```
 sudo ldconfig
 ```
@@ -249,36 +255,36 @@ sudo ldconfig
 
 ## Install and Configure M8C
 
-30. At this stage, you can reboot before installing M8C:
+28. At this stage, you can reboot before installing M8C:
 ```
 cd
 git clone https://github.com/RowdyVoyeur/m8c-rpi4.git
 ```
-31. Followed by, once it’s cloned:
+29. Followed by the commands below, once it’s cloned:
 ```
 cd m8c-rpi4
 make
 sudo make install
 ```
-32. Lastly, make shell scripts executable by everyone:
+30. Lastly, make shell scripts executable by everyone:
 ```
 chmod a+x m8c*.sh
 ```
-33. To generate the config files in `.local/share/m8c` you need to run M8C once. Connect the [Teensy 4.1](https://www.pjrc.com/store/teensy41.html) with the installed [M8 Headless Firmware](https://github.com/Dirtywave/M8HeadlessFirmware) to the Raspberry Pi 4 using a USB data cable. Wait 10 seconds to ensure it is properly connected and run the following commands (use Ctrl+C or close the Terminal window to quit M8C):
+31. To generate the config files in `.local/share/m8c` you need to run M8C once. Connect the [Teensy 4.1](https://www.pjrc.com/store/teensy41.html) with the installed [M8 Headless Firmware](https://github.com/Dirtywave/M8HeadlessFirmware) to the Raspberry Pi 4 using a USB data cable. Wait 10 seconds to ensure it is properly connected and run the following commands (use Ctrl+C or close the Terminal window to quit M8C):
 ```
 cd m8c-rpi4
 ./m8c.sh
 ```
-34. Type the following to find if `config.ini` has been successfully generated (if config.ini isn't listed in this folder, repeat the step above):
+32. Type the following to find if `config.ini` has been successfully generated (if config.ini isn't listed in this folder, repeat the step above):
 ```
 cd .local/share/m8c
 ls
 ```
-35. Edit the `config.ini` file, so the `[graphics]` and `[gamepad]` sections look like [this](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/config.ini.sample). Don't forget to change `fullscreen` and `disable_cursor` to `true`.
+33. Edit the `config.ini` file, so the `[graphics]` and `[gamepad]` sections look like [this](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/config.ini.sample). Don't forget to change `fullscreen` and `disable_cursor` to `true`.
 ```
 sudo nano config.ini
 ```
-36. Then, type the following to point the M8C to the `gamecontrollerdb.txt`, so it finds the game controller mapping:
+34. Then, type the following to point the M8C to the `gamecontrollerdb.txt`, so it finds the game controller mapping:
 ```
 cd ~/.local/share/m8c
 ln -s ~/m8c-rpi4/gamecontrollerdb.txt .
@@ -288,26 +294,38 @@ ln -s ~/m8c-rpi4/gamecontrollerdb.txt .
 
 ## Game Controller Configuration
 
-37. On startup, M8C tries to load a SDL game controller database named gamecontrollerdb.txt from the same directory as the config file. Therefore, you need to check whether `gamecontrollerdb.txt` is inside `.local/share/m8c/`.
+35. On startup, M8C tries to load a SDL game controller database named gamecontrollerdb.txt from the same directory as the config file. Therefore, you need to check whether `gamecontrollerdb.txt` is inside `.local/share/m8c/`.
 
-38. Assuming the `gamecontrollerdb.txt` is in the right place, then you need to ensure that your game controller mapping is listed in this file. Just go to `~/m8c-rpi4` and edit `gamecontrollerdb.txt` and do one of the following:
+36. Assuming the `gamecontrollerdb.txt` is in the right place, then you need to ensure that your specific game controller mapping is listed in this file. Just go to `~/m8c-rpi4`, edit `gamecontrollerdb.txt` and do one of the following:
 
-- Copy the full updated database from [here](https://github.com/gabomdq/SDL_GameControllerDB/blob/master/gamecontrollerdb.txt) and paste it onto gamecontrollerdb.txt. If your game controller is listed, then M8C should automagically recognize it;
+- Copy the full updated database from [here](https://github.com/gabomdq/SDL_GameControllerDB/blob/master/gamecontrollerdb.txt) and paste it onto `gamecontrollerdb.txt`. If your game controller is listed, then M8C should automagically recognize it;
 
 - If this does not work, then download [SDL2 Gamepad Tool](https://generalarcade.com/gamepadtool/) and follow the instructions to get your game controller mapping. Once you have the mapping, paste it under the `#Custom` line of `gamecontrollerdb.txt`.
 
+37. You may also need to edit the `[gamepad]` section of the `config.ini` file found in `.local/share/m8c` to match the configuration of your game controller. You can find more information about the required values [here](https://wiki.libsdl.org/SDL2/SDL_GameControllerButton). If you are using the same game controller as me, then the `[gamepad]` section should remain like [this](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/config.ini.sample).
+
+-----------
+
+## Audio Configuration
+
+38. You may need to customise [this script](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/m8c.sh) to your needs, as described [here](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/AUDIOGUIDE.md#m8c-bash-script). If you have audio related problems, you may need to reconfigure the audio settings in Patchbox OS `Setup Wizard`, as listed [here](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/AUDIOGUIDE.md#patchbox-os-setup-wizard).
+
+39. Adjust the audio levels by opening Terminal and typing `alsamixer`. Then, use the arrows to adjust the output and input levels of your audio card. Exit `alsamixer` using Escape and save your adjustments by typing `sudo alsactl store`. Find more information [here](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/AUDIOGUIDE.md#alsamixer-levels-and-noise-suppression).
 
 -----------
 
 ## MIDI Configuration
 
-39. [amidiauto](https://blokas.io/patchbox-os/docs/amidiauto/) is a background process of Patchbox OS, which takes care of setting up the MIDI routings automatically. Since we will use this [Patchbox module](https://github.com/RowdyVoyeur/m8c-rpi4-module), all MIDI configurations should be done [here](https://github.com/RowdyVoyeur/m8c-rpi4-module/blob/main/amidiauto.conf).
+40. [amidiauto](https://blokas.io/patchbox-os/docs/amidiauto/) is a background process of Patchbox OS, which takes care of setting up the MIDI routings automatically. Since we will use this [Patchbox module](https://github.com/RowdyVoyeur/m8c-rpi4-module), all MIDI configurations should be done [here](https://github.com/RowdyVoyeur/m8c-rpi4-module/blob/main/amidiauto.conf).
 
-40. In [this file](https://github.com/RowdyVoyeur/m8c-rpi4-module/blob/main/amidiauto.conf) you can see that MC-101 and M8 can both send and receive MIDI from each other, nanoKONTROL can send MIDI to M8 and other hardware and software is not allowed to automatically connect ports. This setup works exclusively with this [Patchbox module](https://github.com/RowdyVoyeur/m8c-rpi4-module). So, if you switch modules, these settings won't have any effect.
+41. In [this file](https://github.com/RowdyVoyeur/m8c-rpi4-module/blob/main/amidiauto.conf) you can see that MC-101 and M8 can both send and receive MIDI from each other, nanoKONTROL can send MIDI to M8 and other hardware and software is not allowed to automatically connect ports. This setup works exclusively with this [Patchbox module](https://github.com/RowdyVoyeur/m8c-rpi4-module). So, if you switch modules, these settings won't have any effect.
 
-41. You can configure the `amidiauto.conf` to suit your own needs. If you're using the [Patchbox module](https://github.com/RowdyVoyeur/m8c-rpi4-module), then you should edit [this file](https://github.com/RowdyVoyeur/m8c-rpi4-module/blob/main/amidiauto.conf) by following [these instructions](https://github.com/RowdyVoyeur/m8c-rpi4-module#midi-configuration). Alternatively, you can make these settings permanent for your system by editing the Patchbox OS `amidiauto.conf`. To create a `amidiauto.conf` that makes the MIDI settings permanent to your system (instead of using the Patchbox module), you should follow the steps below:
+42. You can configure the `amidiauto.conf` to suit your own needs. If you're using the [Patchbox module](https://github.com/RowdyVoyeur/m8c-rpi4-module), then you should edit [this file](https://github.com/RowdyVoyeur/m8c-rpi4-module/blob/main/amidiauto.conf) by following [these instructions](https://github.com/RowdyVoyeur/m8c-rpi4-module#midi-configuration).
+
+43. Alternatively, you can make these settings permanent for your system by editing the Patchbox OS `amidiauto.conf`. To create a `amidiauto.conf` that makes the MIDI settings permanent to your system (instead of using the Patchbox module), you should follow the steps below:
 
 - Visit [this page](https://community.blokas.io/t/midi-connection-manager/567/8) to understand how things work.
+
 - List all the connected MIDI devices to find their names with the following command:
 ```
 aconnect -l
@@ -317,14 +335,6 @@ aconnect -l
 ```
 sudo nano /etc/amidiauto.conf
 ```
-
------------
-
-## Audio Configuration
-
-42. Configure the default sound card and audio settings in Patchbox `Setup Wizard`, as listed [here](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/AUDIOGUIDE.md#patchbox-os-setup-wizard) and customise [this script](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/m8c.sh) to your needs as described [here](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/AUDIOGUIDE.md#m8c-bash-script).
-
-43. Adjust the audio levels by opening Terminal and typing `alsamixer`. Then, use the arrows to adjust the output and input levels of your audio card. Exit `alsamixer` using Escape and save your adjustments by typing `sudo alsactl store`. Find more information [here](https://github.com/RowdyVoyeur/m8c-rpi4/blob/main/AUDIOGUIDE.md#alsamixer-levels-and-noise-suppression).
 
 -----------
 
