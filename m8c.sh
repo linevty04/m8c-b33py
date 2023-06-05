@@ -52,6 +52,9 @@ jack_connect system:capture_1 M8_out:playback_2
 # Start CC to Note (Uncomment the line below to start cc-to-note on boot. More info: github.com/RowdyVoyeur/midi-tools)
 # sudo python /home/patch/midi-tools/cc-to-note/main.py --config /home/patch/midi-tools/cc-to-note/config.json &
 
+# Start Control Alsamixer (Uncomment the following line to start control-amixer on boot. More info: github.com/RowdyVoyeur/midi-tools)
+# sudo /bin/bash /home/patch/midi-tools/control-amixer/control-amixer.sh &
+
 # Start M8C
 pushd /home/patch/m8c-rpi4
 ./m8c
