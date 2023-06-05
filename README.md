@@ -336,6 +336,8 @@ aconnect -l
 sudo nano /etc/amidiauto.conf
 ```
 
+Optional: You can install these [MIDI tools](https://github.com/RowdyVoyeur/midi-tools) to control parameters of M8C and Patchbox OS with an external MIDI device, including switching audio routings on the fly, adjusting some `Alsamixer` volume levels and several other things.
+
 -----------
 
 ## Install Patchbox Module
