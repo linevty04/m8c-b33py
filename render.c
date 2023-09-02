@@ -33,8 +33,8 @@ static uint8_t dirty = 0;
 int initialize_sdl(int init_fullscreen, int init_use_gpu) {
   // ticks = SDL_GetTicks();
 
-  const int window_width = 640;  // SDL window width
-  const int window_height = 480; // SDL window height
+  const int window_width = 400;  // SDL window width
+  const int window_height = 240; // SDL window height
 
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
     SDL_LogCritical(SDL_LOG_CATEGORY_ERROR, "SDL_Init: %s\n", SDL_GetError());

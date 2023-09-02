@@ -1,68 +1,66 @@
 #!/bin/bash
 
-# Check if the Instrument with the Card Name "MC101" is connected to the Raspberry Pi
-# Use "aplay -l" to find the Card Name of any connected audio devices
-if [ $(aplay -l | grep -c "MC101") -eq 0 ]; then
-  echo "MC101 not detected, skipping connection."
-else
-  echo "MC101 detected, connecting."
+HWAUDIODEVICE=0
+ENABLEINPUT=0
+RATE=44100
 
-# Open audio interface between the Instrument Out and System In
-# alsa_in options: -r is Sample Rate, -p is Period or Buffer Size, -n is Period, -q is Quality
-alsa_in -j "MC101_in" -d hw:CARD=MC101,DEV=0 -r 44100 -p 64 -n 4 &
+usage()
+{
+    echo "Usage $0"
+    echo "  options:"
+    echo "    [ -i | --interface ] <I> - use audio interface I, defaults to 0"
+    echo "      (see output from aplay -l command)"
+    echo "    [ -r | --rate ] <R> - use R sample rate, defaults to 44100"
+    echo "    [ -e | --enable-input = enable audio input, defaults is off"
+    echo "    [ -h | --help ] show this helpful message"
+}
 
-# Open audio interface between System Out and Instrument In
-# alsa_out options: -r is Sample Rate, -p is Period or Buffer Size, -n is Period, -q is Quality
-alsa_out -j "MC101_out" -d hw:CARD=MC101,DEV=0 -r 44100 -p 64 -n 4 &
-
-sleep 2
-
-# Connect audio of Instrument Out to System In (This allows to hear the additional Instrument)
-jack_connect MC101_in:capture_1 system:playback_1
-jack_connect MC101_in:capture_2 system:playback_2
-
-# Connect audio of USB Card Microphone to MC101 In (This allows to record audio onto the additional Instrument)
-jack_connect system:capture_1 MC101_out:playback_1
-jack_connect system:capture_1 MC101_out:playback_2
-
-# Start MIDI To Command (Uncomment the line below to start midi-to-command on boot. More info: github.com/RowdyVoyeur/midi-tools)
-# sudo python home/patch/midi-tools/midi-to-command/midi2command.py home/patch/midi-tools/midi-to-command/config.cfg -p nanoKONTROL &
-
+OPTIONS=$(getopt -o i:r:eh --long interface:,rate:,enable-input,help -- "$@")
+if [ $? -ne 0 ]; then
+    usage
+    exit 1
 fi
 
-# Open audio interface between M8 Out and System In
-# alsa_in options: -r is Sample Rate, -p is Period or Buffer Size, -n is Period, -q is Quality
-alsa_in -j "M8_in" -d hw:CARD=M8,DEV=0 -r 44100 -p 64 -n 4 &
+eval set -- "$OPTIONS"
 
-# Open audio interface between System Out and M8 In
-# alsa_out options: -r is Sample Rate, -p is Period or Buffer Size, -n is Period, -q is Quality
-alsa_out -j "M8_out" -d hw:CARD=M8,DEV=0 -r 44100 -p 64 -n 4 &
+while true; do
+    case "$1" in
+	-i|--interface)
+	    HWAUDIODEVICE=$2 ; shift 2 ;;
+	-r|--rate)
+	    RATE=$2 ; shift 2 ;;
+	-e|--enable-input)
+	    ENABLEINPUT=1 ; shift ;;
+	-h|--help)
+	    usage ; shift ; exit 0 ;;
+	--)
+	    shift ; break ;;
+    esac
+done
 
-sleep 2
+# audio routing
+export JACK_NO_AUDIO_RESERVATION=1
+jackd -d alsa -d hw:M8 -r$RATE -p512 &
+sleep 1
 
-# Connect audio of M8 Out to System In (This allows to hear the M8)
-jack_connect M8_in:capture_1 system:playback_1
-jack_connect M8_in:capture_2 system:playback_2
+# setup output
+alsa_out -j m8out -d hw:$HWAUDIODEVICE -r $RATE &
+sleep 1
+jack_connect system:capture_1 m8out:playback_1
+jack_connect system:capture_2 m8out:playback_2
 
-# Connect audio of USB Card Microphone to M8 In (This allows to record audio onto the M8)
-# There are 2 system:capture_1 because my USB Card has a mono ADC. Should be changed to capture_1 and capture_2 if stereo ADC
-jack_connect system:capture_1 M8_out:playback_1
-jack_connect system:capture_1 M8_out:playback_2
+# setup input
+if [ $ENABLEINPUT -eq 1 ]; then
+  alsa_in -j m8in -d hw:$HWAUDIODEVICE -r $RATE &
+  sleep 1
+  jack_connect m8in:capture_1 system:playback_1
+  jack_connect m8in:capture_2 system:playback_2
+fi
 
-# Start CC to Note (Uncomment the line below to start cc-to-note on boot. More info: github.com/RowdyVoyeur/midi-tools)
-# sudo python /home/patch/midi-tools/cc-to-note/main.py --config /home/patch/midi-tools/cc-to-note/config.json &
-
-# Start Control Alsamixer (Uncomment the following line to start control-amixer on boot. More info: github.com/RowdyVoyeur/midi-tools)
-# sudo /bin/bash /home/patch/midi-tools/control-amixer/control-amixer.sh &
-
-# Start M8C
-pushd /home/patch/m8c-rpi4
+# start m8 client
+pushd /home/pi/code/m8c
 ./m8c
 popd
 
-# Clean up audio routing
-killall -s SIGINT alsa_out alsa_in
-
-# Shutdown after quitting M8C
-sleep 2
-sudo shutdown now
+# clean up audio routing
+killall -s SIGINT jackd alsa_out alsa_in
