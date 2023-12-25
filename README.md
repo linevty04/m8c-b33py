@@ -1,3 +1,5 @@
+Pulled (copied?) from /RowdyVoyeur/m8c-rpi4 project and modified code to work with Beepy LCD screen resolution. Should be able to compile it and run it on your Beepy! I'm not a programmer though so hopefully you can do some cooler things with it.
+
 # M8C for Raspberry Pi 4 Model B
 
 ## Introduction
