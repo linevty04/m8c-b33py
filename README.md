@@ -1,4 +1,6 @@
 # m8c-b33py
 Modifying Dirtywave m8c headless to run on SQFMI Beeper device https://beepy.sqfmi.com/ it should work, jankily - you'll dive in to some rabbit holes trying to make m8c autostart on barebones OS with no display manager, but it's doable. Easiest is to install lightdm or xfce or some other light weight UI that support bluetooth controllers and whatnot rather than relying soely on SDL graphics running from CLI (which is also doable). (i took my keyboard off the Beepy and am aiming to do a custom control in it's place, in the meantime, had been using the 8BitDo zero2, back removed, taped on lol. Only issue with just using this bt controller/usb connection (which works great) is the firmware on it doesn't support select+up i think, they use that to switch controller mapping on their firmware and this tiny controller doesn't allow custom firmware mappings with their utility i don't think. Anywho. Give me a shout if you get something rad working!
 
+The end goal is/was to pcb out the controller and print/cnc a custom case for the setup. Don't have much time to play nowaday.
+
 ![20231225_003954](https://github.com/linevty04/m8c-b33py/assets/42018524/6203e503-ea24-4dfd-a9e6-934b257fddd3)
